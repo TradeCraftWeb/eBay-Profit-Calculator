@@ -1,0 +1,182 @@
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UK eBay Profit Calculator</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <main class="container">
+        <h1>🇬🇧 UK eBay Profit Calculator</h1>
+        <p class="subtitle">Calculate your potential profit before you list an item on eBay.</p>
+
+        <section class="input-card card">
+            <h2>📊 Item Details & Selling Parameters</h2>
+            <div class="inputs grid-2">
+                <div class="input-group">
+                    <label for="item-name">Item Name</label>
+                    <input type="text" id="item-name" placeholder="e.g., Apple AirPods Pro (Optional)">
+                </div>
+            </div>
+
+            <div class="inputs grid-4">
+                <div class="input-group">
+                    <label for="item-cost">Item Cost (£)</label>
+                    <input type="number" id="item-cost" min="0" value="0.00" step="0.01" placeholder="£0.00">
+                </div>
+                <div class="input-group">
+                    <label for="postage-cost">Postage Cost (£)</label>
+                    <input type="number" id="postage-cost" min="0" value="0.00" step="0.01" placeholder="£0.00">
+                </div>
+                <div class="input-group">
+                    <label for="sale-price">Sale Price (£)</label>
+                    <input type="number" id="sale-price" min="0" value="100.00" step="0.01" placeholder="£0.00">
+                </div>
+            </div>
+
+            <div class="inputs grid-2">
+                 <div class="input-group percentage-group">
+                    <label for="ebay-ad-percent">eBay Ad %</label>
+                    <input type="number" id="ebay-ad-percent" min="0" max="100" value="5" step="0.1" placeholder="5% (Enter 5)">
+                </div>
+            </div>
+
+            <div class="inputs grid-2">
+                <!-- Selection Inputs -->
+                <div class="input-group select-group">
+                    <label for="seller-account-type">Seller Account Type</label>
+                    <select id="seller-account-type" class="select-input">
+                        <option value="private">Private</option>
+                        <option value="business" selected>Business</option>
+                    </select>
+                </div>
+
+                 <div class="input-group select-group">
+                    <label for="top-rated-seller">Top Rated Seller Status</label>
+                    <select id="top-rated-seller" class="select-input">
+                        <option value="No" selected>No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                </div>
+            </div>
+
+             <div class="inputs grid-2">
+                 <div class="input-group select-group">
+                    <label for="category">Category (Variable Rate)</label>
+                    <select id="category" class="select-input">
+                        <option value="everythingElse" selected data-rate="0.129%">Everything else</option>
+                        <option value="businessOfficeIndustrial" data-rate="12.5%">Business, Office and Industrial</option>
+                        <option value="healthBeauty" data-rate="10.9%">Health and Beauty</option>
+                    </select>
+                </div>
+            </div>
+
+        </section>
+
+        <div class="action-buttons">
+            <button id="calculate-btn" class="btn primary-btn">💰 CALCULATE PROFIT</button>
+            <button id="reset-btn" class="btn secondary-btn">🔄 RESET CALCULATOR</button>
+        </div>
+
+
+        <!---------------------------------->
+        <!-- RESULTS SECTION -->
+        <!---------------------------------->
+        <section id="results-summary" class="card result-card">
+            <h2>💰 Summary Results</h2>
+            <div class="result-metric">
+                <span class="metric-label">NET PROFIT:</span>
+                <span id="net-profit" class="metric-value £0.00">£0.00</span>
+                <div id="profit-status" class="status-badge neutral">Neutral</div>
+            </div>
+
+             <div class="result-grid grid-2 margin-top-15">
+                <div>
+                    <span class="metric-label">Profit Margin:</span>
+                    <span id="profit-margin" class="metric-value percentage">0.0%</span>
+                </div>
+                <div>
+                    <span class="metric-label">ROI (Return on Investment):</span>
+                    <span id="roi" class="metric-value percentage">0.0%</span>
+                </div>
+            </div>
+        </section>
+
+        <!---------------------------------->
+        <!-- FEE BREAKDOWN & DETAILS -->
+        <!---------------------------------->
+        <section class="card fee-breakdown-container">
+            <h2>🧾 Fee Breakdown</h2>
+             <div id="fee-details" class="details-grid grid-2">
+                <div class="detail-box col-span-1">
+                    <label>Sale Price:</label>
+                    <p class="value-display" id="display-sale-price">£0.00</p>
+                </div>
+                <div class="detail-box col-span-1">
+                     <label>Item Cost:</label>
+                     <p class="value-display cost-input" id="display-item-cost">£0.00</p>
+                </div>
+
+                 <!-- Fee Details Section -->
+                <h3>eBay Fees Calculation</h3>
+                <div class="fee-item detail-box row-full">
+                    <span class="detail-label variable-fee">Variable Fee</span>
+                    <span id="display-variable-fee" class="value-display fee-calc">£0.00</span>
+                    <small id="var-explanation" class="explanation"></small>
+                </div>
+
+                 <div class="fee-item detail-box row-full">
+                    <span class="detail-label listing-fee">Listing Fee</span>
+                    <span id="display-listing-fee" class="value-display fee-calc">£0.00</span>
+                     <small id="list-explanation" class="explanation"></small>
+                </div>
+
+                <div class="fee-item detail-box row-full">
+                    <span class="detail-label regulatory-fee">Regulatory Fee (3.5%)</span>
+                    <span id="display-regulatory-fee" class="value-display fee-calc">£0.00</span>
+                     <small id="reg-explanation" class="explanation"></small>
+                </div>
+
+                <div class="fee-item detail-box row-full">
+                    <span class="detail-label vat-fee">VAT (20%)</span>
+                    <span id="display-vat-fee" class="value-display fee-calc">£0.00</span>
+                     <small id="vat-explanation" class="explanation"></small>
+                </div>
+
+                 <!-- Total Fees and Advertising -->
+                <div class="total-row detail-box row-full summary-row">
+                    <span class="detail-label total-ebay">TOTAL EBAY FEES:</span>
+                    <span id="display-total-ebay-fees" class="value-display fee-calc">£0.00</span>
+                </div>
+
+                <div class="fee-item detail-box row-full ad-fee-row">
+                    <span class="detail-label advertising-fee">Advertising Fee</span>
+                    <span id="display-advertising-fee" class="value-display fee-calc">£0.00</span>
+                     <small id="ad-explanation" class="explanation"></small>
+                </div>
+
+                 <!-- Total Costs and Profit -->
+                <div class="total-row detail-box row-full summary-row total-cost-row">
+                    <span class="detail-label total-cost">TOTAL COST (Fees + Item + Postage):</span>
+                    <span id="display-total-costs" class="value-display fee-calc">£0.00</span>
+                </div>
+
+                <div class="final-profit detail-box row-full summary-row profit-result">
+                     <span class="detail-label final-profit">NET PROFIT:</span>
+                    <span id="display-net-profit" class="value-display fee-calc large-text">£0.00</span>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2024 eBay Profit Calculator | Powered by JavaScript & HTML/CSS.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
