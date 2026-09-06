@@ -1,0 +1,289 @@
+/* Global Reset and Typography */
+:root {
+    --primary-color: #0d6efd; /* Deep blue for main actions */
+    --secondary-color: #6c757d; /* Grey for secondary actions */
+    --success-color: #198754; /* Green for profit */
+    --warning-color: #ffc107; /* Yellow/Orange for neutral/break even */
+    --danger-color: #dc3545; /* Red for loss */
+    --bg-light: #f8f9fa;
+    --text-dark: #212529;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 950px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 2.2em;
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.subtitle {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #666;
+}
+
+/* --- Cards and Containers --- */
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+}
+
+h2 {
+    font-size: 1.5em;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+/* --- Inputs Grid System --- */
+.inputs {
+    display: grid;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.grid-4 {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.grid-2 {
+    grid-template-columns: repeat(auto-fit, minmax(calc(50% - 10px), 1fr));
+}
+
+/* Input Groups and Labels */
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+input[type="text"], input[type="number"], select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+}
+
+/* Specific styling for percentage input */
+.percentage-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+
+/* --- Buttons and Actions --- */
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.2s, transform 0.1s;
+    flex-grow: 1; /* Allows buttons to share space nicely */
+    min-width: 180px;
+}
+
+.primary-btn {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.secondary-btn {
+    background-color: #e9ecef;
+    color: var(--text-dark);
+    border: 1px solid #ccc;
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.btn:active {
+     transform: translateY(0);
+}
+
+
+/* --- Results Summary Section --- */
+#results-summary {
+    border-top: 3px solid var(--primary-color);
+    background-color: #e6f2ff; /* Light blue tint for emphasis */
+}
+
+.result-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 15px 0;
+    border-bottom: 1px dashed #ccc;
+    margin-bottom: 15px;
+}
+
+.metric-label {
+    font-size: 1.3em;
+    color: #555;
+}
+
+.metric-value {
+    font-size: 2.2em;
+    font-weight: 700;
+}
+
+/* Profit Status Badges */
+.status-badge {
+    padding: 6px 15px;
+    border-radius: 20px;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+}
+
+.profitable { background-color: var(--success-color); }
+.break-even { background-color: var(--warning-color); color: #333;}
+.loss { background-color: var(--danger-color); }
+
+/* --- Fee Breakdown Section --- */
+#fee-details {
+    padding-top: 10px;
+}
+
+.detail-box {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.row-full {
+    flex-direction: column; /* Stack labels/values vertically for better flow */
+    align-items: flex-start;
+}
+
+.detail-label {
+    font-weight: 600;
+    min-width: 25%;
+    color: #495057;
+}
+
+.value-display {
+    font-size: 1.3em;
+    font-weight: 700;
+    min-width: 120px;
+    text-align: right;
+}
+
+/* Special Styling for Totals */
+.summary-row .detail-label {
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+.total-cost-row .value-display {
+     font-size: 1.4em;
+}
+.final-profit .value-display {
+     font-size: 2em !important;
+     color: var(--primary-color);
+}
+
+/* Specific Visual Adjustments */
+.ad-fee-row, .total-cost-row, .summary-row {
+    background-color: #f1f8ff; /* Very light blue background for summary lines */
+}
+
+/* Explanation Tooltips/Small Text */
+small.explanation {
+    display: block;
+    font-size: 0.75em;
+    margin-top: 5px;
+    color: #6c757d;
+    padding-left: 10px;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    .container {
+        margin: 20px auto;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    /* Re-adjusting grids for mobile */
+    .grid-4, .grid-2, .inputs {
+        gap: 15px;
+    }
+
+    /* Making all detail rows stack vertically on small screens */
+    #fee-details .detail-box {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 0;
+    }
+     .detail-label {
+        min-width: auto;
+        margin-bottom: 5px;
+        font-size: 0.9em;
+        color: #333;
+    }
+    .value-display {
+        font-size: 1.8em !important; /* Larger display value on mobile */
+        min-width: auto;
+        text-align: left;
+    }
+
+    /* Buttons should stack cleanly */
+     .action-buttons {
+         flex-direction: column;
+     }
+}
+
+@media (max-width: 480px) {
+    .btn {
+        width: 100%; /* Make buttons full width on smallest screens */
+        min-width: unset;
+    }
+}
