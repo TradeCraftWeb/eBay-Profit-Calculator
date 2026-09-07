@@ -1,182 +1,788 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UK eBay Profit Calculator</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eBay UK Profit Calculator</title>
+  <style>
+    /* ─── Design Tokens ─────────────────────────────────────────── */
+    :root {
+      --brand:        #e53238;
+      --brand-dark:   #b01e23;
+      --brand-light:  #fdecea;
+      --accent:       #0064d2;
+      --accent-light: #e8f0fc;
+      --surface:      #ffffff;
+      --surface-alt:  #f7f8fa;
+      --border:       #dde1e7;
+      --text:         #1a1a2e;
+      --text-muted:   #6b7280;
+      --success:      #16a34a;
+      --success-bg:   #dcfce7;
+      --danger:       #dc2626;
+      --danger-bg:    #fee2e2;
+      --warning:      #d97706;
+      --warning-bg:   #fef3c7;
+      --radius:       12px;
+      --radius-sm:    8px;
+      --shadow:       0 4px 24px rgba(0,0,0,0.08);
+      --shadow-lg:    0 8px 40px rgba(0,0,0,0.14);
+      --transition:   0.2s ease;
+    }
+
+    /* ─── Reset & Base ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #f0f4ff 0%, #fff5f5 100%);
+      min-height: 100vh;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* ─── Header ────────────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+      color: white;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    header .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    header h1 {
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      opacity: 0.88;
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+    }
+
+    /* ─── Main Layout ───────────────────────────────────────────── */
+    main {
+      max-width: 1100px;
+      margin: 2.5rem auto;
+      padding: 0 1rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 390px;
+      gap: 1.75rem;
+      align-items: start;
+    }
+
+    @media (max-width: 860px) {
+      main { grid-template-columns: 1fr; }
+    }
+
+    /* ─── Card ──────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--surface-alt);
+    }
+
+    .card-header h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .card-header .icon {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .card-header .icon.red   { background: var(--brand-light); color: var(--brand); }
+    .card-header .icon.green { background: var(--success-bg); color: var(--success); }
+
+    .card-body { padding: 1.5rem; }
+
+    /* ─── Form Grid ─────────────────────────────────────────────── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.1rem;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-prefix, .input-suffix {
+      position: absolute;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      pointer-events: none;
+      user-select: none;
+    }
+    .input-prefix { left: 0.85rem; }
+    .input-suffix { right: 0.85rem; }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--surface);
+      transition: border-color var(--transition), box-shadow var(--transition);
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="number"].has-prefix { padding-left: 2rem; }
+    input[type="number"].has-suffix { padding-right: 2.5rem; }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,100,210,0.12);
+    }
+
+    /* Custom select arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: "";
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      translate: 0 -50%;
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid var(--text-muted);
+      pointer-events: none;
+    }
+    .select-wrap select { padding-right: 2.2rem; }
+
+    /* ─── Toggle Pills ──────────────────────────────────────────── */
+    .toggle-group {
+      display: flex;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .toggle-group input[type="radio"] {
+      position: absolute;
+      clip-path: inset(50%);
+      overflow: hidden;
+      width: 1px; height: 1px;
+      margin: -1px; padding: 0; border: 0;
+      white-space: nowrap;
+    }
+
+    .toggle-group label {
+      flex: 1;
+      padding: 0.65rem 0.5rem;
+      text-align: center;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: normal;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+      background: var(--surface);
+    }
+
+    .toggle-group input[type="radio"]:checked + label {
+      background: var(--accent);
+      color: white;
+    }
+
+    .toggle-group input[type="radio"]:focus-visible + label {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    .toggle-group > * + * { border-left: 1px solid var(--border); }
+
+    /* ─── Divider ───────────────────────────────────────────────── */
+    .section-divider {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin: 0.5rem 0;
+    }
+    .section-divider::before,
+    .section-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ─── Calculate Button ──────────────────────────────────────── */
+    .btn-calculate {
+      width: 100%;
+      margin-top: 1.4rem;
+      padding: 0.9rem 1.5rem;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+      box-shadow: 0 4px 14px rgba(229, 50, 56, 0.35);
+      letter-spacing: 0.02em;
+    }
+
+    .btn-calculate:hover {
+      filter: brightness(1.07);
+      box-shadow: 0 6px 20px rgba(229, 50, 56, 0.45);
+    }
+
+    .btn-calculate:active { transform: scale(0.985); }
+
+    /* ─── Results Panel ─────────────────────────────────────────── */
+    .results-card { position: sticky; top: 1.5rem; }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      gap: 0.5rem;
+    }
+
+    .result-row:last-child { border-bottom: none; }
+
+    .result-label {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .result-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* Profit banner */
+    .profit-banner {
+      border-radius: var(--radius-sm);
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .profit-banner.positive { background: var(--success-bg); }
+    .profit-banner.negative { background: var(--danger-bg); }
+    .profit-banner.neutral  { background: var(--surface-alt); }
+
+    .profit-banner .profit-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .profit-banner.positive .profit-label { color: var(--success); }
+    .profit-banner.negative .profit-label { color: var(--danger); }
+    .profit-banner.neutral  .profit-label { color: var(--text-muted); }
+
+    .profit-banner .profit-amount {
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .profit-banner.positive .profit-amount { color: var(--success); }
+    .profit-banner.negative .profit-amount { color: var(--danger); }
+    .profit-banner.neutral  .profit-amount { color: var(--text-muted); }
+
+    /* Margin pill */
+    .margin-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .margin-pill.positive { background: var(--success-bg); color: var(--success); }
+    .margin-pill.negative { background: var(--danger-bg);  color: var(--danger); }
+    .margin-pill.neutral  { background: var(--surface-alt); color: var(--text-muted); }
+
+    /* Fee breakdown sub-items */
+    .sub-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.45rem 0 0.45rem 1rem;
+      border-bottom: 1px dashed var(--border);
+      gap: 0.5rem;
+    }
+
+    .sub-row:last-child { border-bottom: none; }
+
+    .sub-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .sub-value {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .total-fees-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-top: 2px solid var(--border);
+      margin-top: 0.25rem;
+    }
+
+    .total-fees-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .total-fees-value {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--danger);
+    }
+
+    /* Placeholder state */
+    .placeholder-msg {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .placeholder-msg .placeholder-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .placeholder-msg p {
+      font-size: 0.88rem;
+    }
+
+    /* ─── Info note ─────────────────────────────────────────────── */
+    .info-note {
+      background: var(--accent-light);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.8rem;
+      color: var(--accent);
+      margin-top: 0.25rem;
+      grid-column: 1 / -1;
+    }
+
+    /* ─── Footer ────────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    footer a { color: var(--accent); }
+
+    /* ─── Responsive tweaks ─────────────────────────────────────── */
+    @media (max-width: 540px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: 1; }
+      .section-divider { grid-column: 1; }
+      .info-note { grid-column: 1; }
+    }
+
+    /* ─── Animation ─────────────────────────────────────────────── */
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .results-populated { animation: fadeSlideIn 0.3s ease; }
+
+    /* ─── accent-color for native controls ──────────────────────── */
+    :root { accent-color: var(--accent); }
+
+    /* ─── Hide number spinners ──────────────────────────────────── */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type="number"] { -moz-appearance: textfield; }
+  </style>
 </head>
 <body>
 
-    <main class="container">
-        <h1>🇬🇧 UK eBay Profit Calculator</h1>
-        <p class="subtitle">Calculate your potential profit before you list an item on eBay.</p>
+<!-- ─── Header ─────────────────────────────────────────────────── -->
+<header>
+  <div class="logo">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+      <rect width="36" height="36" rx="8" fill="white" fill-opacity="0.2"/>
+      <text x="18" y="26" font-size="20" text-anchor="middle" fill="white" font-family="Arial" font-weight="800">£</text>
+    </svg>
+    <h1>eBay UK Profit Calculator</h1>
+  </div>
+  <p>Calculate your real profit after all eBay fees &amp; postage costs</p>
+</header>
 
-        <section class="input-card card">
-            <h2>📊 Item Details & Selling Parameters</h2>
-            <div class="inputs grid-2">
-                <div class="input-group">
-                    <label for="item-name">Item Name</label>
-                    <input type="text" id="item-name" placeholder="e.g., Apple AirPods Pro (Optional)">
-                </div>
+<!-- ─── Main ───────────────────────────────────────────────────── -->
+<main>
+
+  <!-- Inputs Card -->
+  <div class="card">
+    <div class="card-header">
+      <div class="icon red">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <h2>Item Details</h2>
+    </div>
+    <div class="card-body">
+      <form id="calcForm" novalidate>
+        <div class="form-grid">
+
+          <!-- 1. Item Name -->
+          <div class="form-group full">
+            <label for="itemName">Item Name</label>
+            <input type="text" id="itemName" name="itemName" placeholder="e.g. Vintage Film Camera" autocomplete="off" />
+          </div>
+
+          <!-- 2. Item Cost -->
+          <div class="form-group">
+            <label for="itemCost">Item Cost</label>
+            <div class="input-wrap">
+              <span class="input-prefix" aria-hidden="true">£</span>
+              <input type="number" id="itemCost" name="itemCost" class="has-prefix" min="0" step="0.01" placeholder="0.00" />
             </div>
+          </div>
 
-            <div class="inputs grid-4">
-                <div class="input-group">
-                    <label for="item-cost">Item Cost (£)</label>
-                    <input type="number" id="item-cost" min="0" value="0.00" step="0.01" placeholder="£0.00">
-                </div>
-                <div class="input-group">
-                    <label for="postage-cost">Postage Cost (£)</label>
-                    <input type="number" id="postage-cost" min="0" value="0.00" step="0.01" placeholder="£0.00">
-                </div>
-                <div class="input-group">
-                    <label for="sale-price">Sale Price (£)</label>
-                    <input type="number" id="sale-price" min="0" value="100.00" step="0.01" placeholder="£0.00">
-                </div>
+          <!-- 3. Postage Cost -->
+          <div class="form-group">
+            <label for="postageCost">Postage Cost</label>
+            <div class="input-wrap">
+              <span class="input-prefix" aria-hidden="true">£</span>
+              <input type="number" id="postageCost" name="postageCost" class="has-prefix" min="0" step="0.01" placeholder="0.00" />
             </div>
+          </div>
 
-            <div class="inputs grid-2">
-                 <div class="input-group percentage-group">
-                    <label for="ebay-ad-percent">eBay Ad %</label>
-                    <input type="number" id="ebay-ad-percent" min="0" max="100" value="5" step="0.1" placeholder="5% (Enter 5)">
-                </div>
+          <!-- 4. Sale Price -->
+          <div class="form-group">
+            <label for="salePrice">Sale Price</label>
+            <div class="input-wrap">
+              <span class="input-prefix" aria-hidden="true">£</span>
+              <input type="number" id="salePrice" name="salePrice" class="has-prefix" min="0" step="0.01" placeholder="0.00" />
             </div>
+          </div>
 
-            <div class="inputs grid-2">
-                <!-- Selection Inputs -->
-                <div class="input-group select-group">
-                    <label for="seller-account-type">Seller Account Type</label>
-                    <select id="seller-account-type" class="select-input">
-                        <option value="private">Private</option>
-                        <option value="business" selected>Business</option>
-                    </select>
-                </div>
-
-                 <div class="input-group select-group">
-                    <label for="top-rated-seller">Top Rated Seller Status</label>
-                    <select id="top-rated-seller" class="select-input">
-                        <option value="No" selected>No</option>
-                        <option value="Yes">Yes</option>
-                    </select>
-                </div>
+          <!-- 5. eBay Ad % -->
+          <div class="form-group">
+            <label for="adPercent">eBay Ad Rate</label>
+            <div class="input-wrap">
+              <input type="number" id="adPercent" name="adPercent" class="has-suffix" min="0" max="100" step="0.1" placeholder="0.0" />
+              <span class="input-suffix" aria-hidden="true">%</span>
             </div>
+          </div>
 
-             <div class="inputs grid-2">
-                 <div class="input-group select-group">
-                    <label for="category">Category (Variable Rate)</label>
-                    <select id="category" class="select-input">
-                        <option value="everythingElse" selected data-rate="0.129%">Everything else</option>
-                        <option value="businessOfficeIndustrial" data-rate="12.5%">Business, Office and Industrial</option>
-                        <option value="healthBeauty" data-rate="10.9%">Health and Beauty</option>
-                    </select>
-                </div>
+          <!-- Divider -->
+          <div class="section-divider">Account &amp; Category</div>
+
+          <!-- 6. Seller Account Type -->
+          <div class="form-group">
+            <label>Seller Account Type</label>
+            <div class="toggle-group" role="group" aria-label="Seller account type">
+              <input type="radio" id="acctPrivate" name="accountType" value="private" checked />
+              <label for="acctPrivate">Private</label>
+              <input type="radio" id="acctBusiness" name="accountType" value="business" />
+              <label for="acctBusiness">Business</label>
             </div>
+          </div>
 
-        </section>
+          <!-- 7. Top Rated Seller -->
+          <div class="form-group">
+            <label>Top Rated Seller</label>
+            <div class="toggle-group" role="group" aria-label="Top rated seller">
+              <input type="radio" id="trsNo" name="topRated" value="no" checked />
+              <label for="trsNo">No</label>
+              <input type="radio" id="trsYes" name="topRated" value="yes" />
+              <label for="trsYes">Yes (−10%)</label>
+            </div>
+          </div>
 
-        <div class="action-buttons">
-            <button id="calculate-btn" class="btn primary-btn">💰 CALCULATE PROFIT</button>
-            <button id="reset-btn" class="btn secondary-btn">🔄 RESET CALCULATOR</button>
+          <!-- 8. Category -->
+          <div class="form-group full">
+            <label for="category">Category</label>
+            <div class="select-wrap">
+              <select id="category" name="category">
+                <option value="0.129">Everything Else — 12.9%</option>
+                <option value="0.125">Business, Office &amp; Industrial — 12.5%</option>
+                <option value="0.109">Health &amp; Beauty — 10.9%</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Info note -->
+          <p class="info-note" role="note">
+            💡 Fees are based on <strong>Sale Price</strong>. VAT at 20% is charged on the combined eBay service fees (Variable + Listing + Regulatory).
+          </p>
+
         </div>
 
+        <button type="submit" class="btn-calculate">
+          ⟶ &nbsp;Calculate Profit
+        </button>
+      </form>
+    </div>
+  </div>
 
-        <!---------------------------------->
-        <!-- RESULTS SECTION -->
-        <!---------------------------------->
-        <section id="results-summary" class="card result-card">
-            <h2>💰 Summary Results</h2>
-            <div class="result-metric">
-                <span class="metric-label">NET PROFIT:</span>
-                <span id="net-profit" class="metric-value £0.00">£0.00</span>
-                <div id="profit-status" class="status-badge neutral">Neutral</div>
+  <!-- Results Card -->
+  <div class="card results-card" id="resultsCard">
+    <div class="card-header">
+      <div class="icon green">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+      </div>
+      <h2>Results</h2>
+    </div>
+    <div class="card-body">
+
+      <!-- Placeholder -->
+      <div class="placeholder-msg" id="placeholder">
+        <div class="placeholder-icon" aria-hidden="true">📊</div>
+        <p>Fill in your item details and press <strong>Calculate Profit</strong> to see a full fee breakdown.</p>
+      </div>
+
+      <!-- Results content -->
+      <div id="resultsContent" hidden>
+
+        <!-- Profit / Loss Banner -->
+        <div class="profit-banner neutral" id="profitBanner">
+          <div>
+            <div class="profit-label" id="profitLabel">Net Profit</div>
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.35rem;">
+              <span class="margin-pill neutral" id="marginPill">0.0%</span>
+              <span style="font-size:0.75rem;color:var(--text-muted)">margin</span>
             </div>
+          </div>
+          <div class="profit-amount" id="profitAmount">£0.00</div>
+        </div>
 
-             <div class="result-grid grid-2 margin-top-15">
-                <div>
-                    <span class="metric-label">Profit Margin:</span>
-                    <span id="profit-margin" class="metric-value percentage">0.0%</span>
-                </div>
-                <div>
-                    <span class="metric-label">ROI (Return on Investment):</span>
-                    <span id="roi" class="metric-value percentage">0.0%</span>
-                </div>
-            </div>
-        </section>
+        <!-- Summary rows -->
+        <div class="result-row">
+          <span class="result-label">Sale Price</span>
+          <span class="result-value" id="rSalePrice">—</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Item Cost</span>
+          <span class="result-value" id="rItemCost">—</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Postage Cost</span>
+          <span class="result-value" id="rPostageCost">—</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">eBay Ad Cost</span>
+          <span class="result-value" id="rAdCost">—</span>
+        </div>
 
-        <!---------------------------------->
-        <!-- FEE BREAKDOWN & DETAILS -->
-        <!---------------------------------->
-        <section class="card fee-breakdown-container">
-            <h2>🧾 Fee Breakdown</h2>
-             <div id="fee-details" class="details-grid grid-2">
-                <div class="detail-box col-span-1">
-                    <label>Sale Price:</label>
-                    <p class="value-display" id="display-sale-price">£0.00</p>
-                </div>
-                <div class="detail-box col-span-1">
-                     <label>Item Cost:</label>
-                     <p class="value-display cost-input" id="display-item-cost">£0.00</p>
-                </div>
+        <!-- Fee breakdown -->
+        <div style="margin-top:1.1rem;">
+          <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:0.5rem;">
+            eBay Fee Breakdown
+          </div>
 
-                 <!-- Fee Details Section -->
-                <h3>eBay Fees Calculation</h3>
-                <div class="fee-item detail-box row-full">
-                    <span class="detail-label variable-fee">Variable Fee</span>
-                    <span id="display-variable-fee" class="value-display fee-calc">£0.00</span>
-                    <small id="var-explanation" class="explanation"></small>
-                </div>
+          <div class="sub-row">
+            <span class="sub-label" id="rVarFeeLabel">Variable Fee</span>
+            <span class="sub-value" id="rVarFee">—</span>
+          </div>
+          <div class="sub-row">
+            <span class="sub-label">Listing Fee</span>
+            <span class="sub-value" id="rListFee">—</span>
+          </div>
+          <div class="sub-row">
+            <span class="sub-label">Regulatory Fee (3.5%)</span>
+            <span class="sub-value" id="rRegFee">—</span>
+          </div>
+          <div class="sub-row">
+            <span class="sub-label">VAT on Fees (20%)</span>
+            <span class="sub-value" id="rVat">—</span>
+          </div>
 
-                 <div class="fee-item detail-box row-full">
-                    <span class="detail-label listing-fee">Listing Fee</span>
-                    <span id="display-listing-fee" class="value-display fee-calc">£0.00</span>
-                     <small id="list-explanation" class="explanation"></small>
-                </div>
+          <div class="total-fees-row">
+            <span class="total-fees-label">Total eBay Fees</span>
+            <span class="total-fees-value" id="rTotalFees">—</span>
+          </div>
+        </div>
 
-                <div class="fee-item detail-box row-full">
-                    <span class="detail-label regulatory-fee">Regulatory Fee (3.5%)</span>
-                    <span id="display-regulatory-fee" class="value-display fee-calc">£0.00</span>
-                     <small id="reg-explanation" class="explanation"></small>
-                </div>
+      </div><!-- /#resultsContent -->
+    </div>
+  </div>
 
-                <div class="fee-item detail-box row-full">
-                    <span class="detail-label vat-fee">VAT (20%)</span>
-                    <span id="display-vat-fee" class="value-display fee-calc">£0.00</span>
-                     <small id="vat-explanation" class="explanation"></small>
-                </div>
+</main>
 
-                 <!-- Total Fees and Advertising -->
-                <div class="total-row detail-box row-full summary-row">
-                    <span class="detail-label total-ebay">TOTAL EBAY FEES:</span>
-                    <span id="display-total-ebay-fees" class="value-display fee-calc">£0.00</span>
-                </div>
+<!-- ─── Footer ─────────────────────────────────────────────────── -->
+<footer>
+  <p>eBay UK fee rates correct as of September 2026. Always verify current rates on
+    <a href="https://www.ebay.co.uk/help/selling/fees-credits-invoices/selling-fees" target="_blank" rel="noopener">eBay's fees page</a>.
+  </p>
+  <p style="margin-top:0.25rem;">This calculator is for informational purposes only and does not constitute financial advice.</p>
+</footer>
 
-                <div class="fee-item detail-box row-full ad-fee-row">
-                    <span class="detail-label advertising-fee">Advertising Fee</span>
-                    <span id="display-advertising-fee" class="value-display fee-calc">£0.00</span>
-                     <small id="ad-explanation" class="explanation"></small>
-                </div>
+<!-- ─── JavaScript ──────────────────────────────────────────────── -->
+<script>
+  'use strict';
 
-                 <!-- Total Costs and Profit -->
-                <div class="total-row detail-box row-full summary-row total-cost-row">
-                    <span class="detail-label total-cost">TOTAL COST (Fees + Item + Postage):</span>
-                    <span id="display-total-costs" class="value-display fee-calc">£0.00</span>
-                </div>
+  const fmt = (n) =>
+    '£' + Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-                <div class="final-profit detail-box row-full summary-row profit-result">
-                     <span class="detail-label final-profit">NET PROFIT:</span>
-                    <span id="display-net-profit" class="value-display fee-calc large-text">£0.00</span>
-                </div>
-            </div>
+  const form        = document.getElementById('calcForm');
+  const placeholder = document.getElementById('placeholder');
+  const content     = document.getElementById('resultsContent');
+  let calculated    = false;
 
-        </section>
+  function getRadio(name) {
+    return document.querySelector(`input[name="${name}"]:checked`)?.value ?? null;
+  }
 
-    </main>
+  function calculate(e) {
+    if (e && e.preventDefault) e.preventDefault();
 
-    <footer>
-        <p>&copy; 2024 eBay Profit Calculator | Powered by JavaScript & HTML/CSS.</p>
-    </footer>
-    <script src="script.js"></script>
+    const itemCost     = parseFloat(document.getElementById('itemCost').value)    || 0;
+    const postageCost  = parseFloat(document.getElementById('postageCost').value) || 0;
+    const salePrice    = parseFloat(document.getElementById('salePrice').value)   || 0;
+    const adPercent    = parseFloat(document.getElementById('adPercent').value)   || 0;
+    const catRate      = parseFloat(document.getElementById('category').value);   // 0.129 etc.
+    const topRated     = getRadio('topRated') === 'yes';
+
+    // ── Fee Calculations ─────────────────────────────────────
+    // Variable Fee = Sale Price × Category rate
+    let variableFee = salePrice * catRate;
+    // Top Rated Seller discount: reduce variable fee by 10%
+    if (topRated) variableFee *= 0.90;
+
+    // Listing Fee
+    const listingFee = salePrice < 10 ? 0.30 : 0.40;
+
+    // Regulatory Fee
+    const regulatoryFee = salePrice * 0.035;
+
+    // VAT on eBay service fees only
+    const vat = (variableFee + listingFee + regulatoryFee) * 0.20;
+
+    // eBay Ad Cost
+    const adCost = salePrice * (adPercent / 100);
+
+    // Total eBay platform fees (inc. VAT, excl. ad cost)
+    const totalFees = variableFee + listingFee + regulatoryFee + vat;
+
+    // Net Profit
+    const profit = salePrice - itemCost - postageCost - adCost - totalFees;
+
+    // Margin %
+    const marginPct = salePrice > 0 ? (profit / salePrice) * 100 : 0;
+
+    // ── Render ────────────────────────────────────────────────
+    placeholder.hidden = true;
+    content.hidden = false;
+
+    // Restart animation
+    content.classList.remove('results-populated');
+    void content.offsetWidth;
+    content.classList.add('results-populated');
+
+    calculated = true;
+
+    // Profit banner
+    const banner = document.getElementById('profitBanner');
+    const cls    = profit > 0 ? 'positive' : profit < 0 ? 'negative' : 'neutral';
+    banner.className = `profit-banner ${cls}`;
+
+    document.getElementById('profitLabel').textContent  = profit < 0 ? 'Net Loss' : 'Net Profit';
+    document.getElementById('profitAmount').textContent = (profit < 0 ? '−' : '') + fmt(profit);
+
+    const pill = document.getElementById('marginPill');
+    pill.className = `margin-pill ${cls}`;
+    pill.textContent = (profit < 0 ? '−' : '+') + Math.abs(marginPct).toFixed(1) + '%';
+
+    // Summary rows
+    document.getElementById('rSalePrice').textContent   = fmt(salePrice);
+    document.getElementById('rItemCost').textContent    = '−' + fmt(itemCost);
+    document.getElementById('rPostageCost').textContent = '−' + fmt(postageCost);
+    document.getElementById('rAdCost').textContent      = adCost > 0 ? '−' + fmt(adCost) : '£0.00';
+
+    // Fee breakdown
+    const trs    = topRated ? ' −10% TRS' : '';
+    const pctStr = (catRate * 100).toFixed(1) + '%';
+    document.getElementById('rVarFeeLabel').textContent = `Variable Fee (${pctStr}${trs})`;
+    document.getElementById('rVarFee').textContent      = '−' + fmt(variableFee);
+    document.getElementById('rListFee').textContent     = '−' + fmt(listingFee);
+    document.getElementById('rRegFee').textContent      = '−' + fmt(regulatoryFee);
+    document.getElementById('rVat').textContent         = '−' + fmt(vat);
+    document.getElementById('rTotalFees').textContent   = '−' + fmt(totalFees);
+  }
+
+  // Submit triggers calculation
+  form.addEventListener('submit', calculate);
+
+  // Live recalculation once first calc has been done
+  function liveUpdate() {
+    if (calculated) calculate(null);
+  }
+  form.addEventListener('input',  liveUpdate);
+  form.addEventListener('change', liveUpdate);
+</script>
+
 </body>
 </html>
